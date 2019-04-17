@@ -9,6 +9,7 @@ export default class Game {
         this.player2.position.x = 2;
         this.player2.position.y = 5;
         this.map =  new Map('map');
+        window.addEventListener('endMove', this.endTurn.bind(this));
     }
 
     generateMap(){
@@ -21,5 +22,9 @@ export default class Game {
             }else{
                 this.player2.readyToMove();
             }
+    }
+    endTurn(){
+        this.turnNumber++;
+        this.play();
     }
 }

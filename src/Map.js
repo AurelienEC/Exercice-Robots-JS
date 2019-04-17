@@ -10,8 +10,10 @@ export default class Map{
     }
 
     createMap(){
+        console.log("create");
         let x = 0
         let y = 0
+        this.map.innerHTML = '';
         while (y < this.yAxis){
             let currentLineDiv = document.createElement('div')
             currentLineDiv.id = `line-${y}`;
@@ -27,7 +29,7 @@ export default class Map{
             this.map.appendChild(currentLineDiv);
             y++
         }
-        document.getElementById('id-3-2').classList.add('rock');
+        //document.getElementById('id-3-2').classList.add('rock');
     }
     addCharactersToMap(characters){
         characters.forEach((char) => {
@@ -36,56 +38,83 @@ export default class Map{
             elt.classList.add(char.name);
         });
         this.characters = [... characters];
-        console.log(this.characters);
+
+    }
+    refreshCharactersOnMap(){
+        this.characters.forEach((char) => {
+            let elt = document.getElementById(`id-${char.position.y}-${char.position.x}`);
+            elt.classList.add('character');
+            elt.classList.add(char.name);
+        });
+
     }
 
     prepareMove(e){
         let robot = e.detail;
+        console.log(robot);
         // for xAxis
-        for(let i = -3; i < 4; i++){
+        for(let i = -1; i > -robot.speed; i--){
             let elt = document.getElementById(`id-${robot.position.y}-${robot.position.x + i}`);
-            if(elt !== null && !elt.classList.contains(robot.name)){
-                elt.classList.add('move');
-                elt.classList.add(robot.name);
+            if(elt !== null){
+                if(!elt.classList.contains('character') && !elt.classList.contains('rock')){
+                    elt.classList.add('move');
+                    elt.classList.add(robot.name);
+                }else if(elt.classList.contains('rock') || elt.classList.contains('character')){
+                    break;
+                }
+            }
+
+        }
+        for(let i = 1; i <= robot.speed; i++){
+            let elt = document.getElementById(`id-${robot.position.y}-${robot.position.x + i}`);
+            if(elt !== null){
+                if(!elt.classList.contains('character') && !elt.classList.contains('rock')){
+                    elt.classList.add('move');
+                    elt.classList.add(robot.name);
+                }else if(elt.classList.contains('rock') || elt.classList.contains('character')){
+                    break;
+                }
             }
         }
         // for yAxis
-        for(let i = 0; i < 4; i++){
+        for(let i = 1; i <= robot.speed; i++){
             let elt = document.getElementById(`id-${robot.position.y + i }-${robot.position.x}`);
-            if(elt !== null && !elt.classList.contains(robot.name) && !elt.classList.contains('rock')){
-                elt.classList.add('move');
-                elt.classList.add(robot.name);
-            }else if(elt.classList.contains('rock')){
-                break;
+            if(elt !==null){
+                if(!elt.classList.contains('character') && !elt.classList.contains('rock')){
+                    elt.classList.add('move');
+                    elt.classList.add(robot.name);
+                }else if(elt.classList.contains('rock') || elt.classList.contains('character')){
+                    break;
+                }
+            }
+
+        }
+        for(let i = -1; i > - robot.speed; i--){
+            let elt = document.getElementById(`id-${robot.position.y + i }-${robot.position.x}`);
+            if(elt !==null){
+                if(!elt.classList.contains('character') && !elt.classList.contains('rock')){
+                    elt.classList.add('move');
+                    elt.classList.add(robot.name);
+                }else if(elt.classList.contains('rock') || elt.classList.contains('character')) {
+                    break;
+                }
             }
         }
-        for(let i = 0; i > -4; i--){
-            let elt = document.getElementById(`id-${robot.position.y + i }-${robot.position.x}`);
-            if(elt !== null && !elt.classList.contains(robot.name) && !elt.classList.contains('rock')){
-                elt.classList.add('move');
-                elt.classList.add(robot.name);
-            }else if(elt.classList.contains('rock')){
-                break;
-            }
-        }
-        this.listeners();
+        this.listeners(robot);
     }
-    listeners(){
+    listeners(robot){
        let movesCases = Array.from(document.getElementsByClassName('move'));
-       console.log(movesCases);
        movesCases.forEach((elt) => {
            elt.addEventListener('click', (e) => {
-               console.log(e);
-               alert("tu as cliqué ici");
-               let selected = e.path[0];
-               selected.classList.remove('move');
-               selected.classList.remove('case');
-               let name = selected.classList.value
-               selected.classList.add('case');
-               console.log(name);
-               let char = this.characters.find( char => char.name === name )
-               console.log('personnage', char);
+               robot.move(elt);
+               this.refreshMap();
            })
         })
+    }
+    refreshMap(){
+        this.createMap();
+        this.refreshCharactersOnMap();
+        let event = new CustomEvent('endMove', {'detail' : this});
+        window.dispatchEvent(event);
     }
 }

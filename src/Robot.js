@@ -3,7 +3,7 @@ export default class Robot{
         this.name = name;
         this.life = 100;
         this.speed = 3;
-        this.position = {x: 0, y:0}
+        this.position = {x: 5, y:5}
     }
 
     introduce(){
@@ -14,7 +14,15 @@ export default class Robot{
          let event = new CustomEvent('readyToMove', {'detail' : this});
          window.dispatchEvent(event);
     }
-    move(){
-       //TODO
+
+    move(element){
+        let place = element.id.split("-") //id-3-2
+        this.position.y = Number(place[1]);
+        this.position.x = Number(place[2]);
+
+        //TODO: Check if exist weapon on the map element
+
+        //TODO: Check if the robot is next to another Robot with is new position
+
     }
 }
